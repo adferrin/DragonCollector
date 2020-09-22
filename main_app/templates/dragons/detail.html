@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="row">
+        <div class="col s6">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">{{ dragon.name }}</span>
+                    <p>Breed: {{ dragon.breed }}</p>
+                    <p>Description: {{ dragon.description }}</p>
+                    {% if dragon.age > 0 %}
+                    <p>Age: {{ dragon.age }}</p>
+                    {% else %}    
+                    <p>Age: Egg</p>
+                    {% endif %}
+                </div>
+                <div class="card-action">
+                    <a href="{% url 'dragons_update' dragon.id %}">Edit</a>
+                    <a href="{% url 'dragons_delete' dragon.id %}">Delete</a>
+                </div>
+            </div>
+        </div>
+        <div class="col s6">
+            <form action="{% url 'add_feeding' dragon.id %}" method="post">
+                {% csrf_token %}
+                {{ feeding_form.as_p }}
+                <input type="submit" value="Add Feeding" class="btn">
+            </form>
+            <br>
+            {% if dragon.fed_for_today %}
+                <div class="card-panel teal-text center-align">{{dragon.name}} has been fed all meals for today</div>
+            {% else %}
+                <div class="card-panel red-text center-align">{{dragon.name}} might be hungry</div>
+            {% endif %}
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Meal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for feeding in dragon.feeding_set.all %}
+                    <tr>
+                        <td>{{ feeding.date }}</td>
+                        <td>{{ feeding.get_meal_display }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col s6">
+            <h3>{{ dragon.name }}'s Toys</h3>
+            {% if dragon.toys.count %}
+                {% for toy in dragon.toys.all %}
+                    <div class="card">
+                        <div class="card-content">
+                        <span class="card-title">A <span style="color: {{ toy.color.lower }};">{{ toy.color }}</span> {{ toy.name }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h5>No Toys 😿</h5>
+            {% endif %}
+        </div>
+        <div class="col s6">
+            <h3>Available Toys</h3>
+            {% if toys.count %}
+                {% for toy in toys.all %}
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">A <span style="color: {{ toy.color.lower }};">{{ toy.color }}</span> {{ toy.name }}</span>
+                        </div>
+                        <div class="card-action">
+                            <form action="{% url 'assoc_toy' dragon.id toy.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn">Add</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h5>{{ dragon.name }} Already Has All Toys Available</h5>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        // This is where we will configure our Materialize Form Widgets
+        // Cached Element Refs
+        const dateEl = document.getElementById('id_date');
+        const selectEl = document.getElementById('id_meal');
+        // Config
+        M.Datepicker.init(dateEl, {
+            format: 'yyyy-mm-dd',
+            defaultDate: new Date(),
+            setDefaultDate: true,
+            autoClose: true
+        });
+        M.FormSelect.init(selectEl);
+    </script>            
+{% endblock %}

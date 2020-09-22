@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+
+{% for dragon in dragons %}
+  <div class="card">
+      <a href="{% url 'detail' dragon.id %}">
+        <div class="card-content">
+        <span class="card-title">{{ dragon.name }}</span>
+        <p>Breed: {{ dragon.breed }}</p>
+        <p>Description: {{ dragon.description }}</p>
+        {% if dragon.age > 0 %}
+            <p>Age: {{ dragon.age }}</p>
+        {% else %}
+            <p>Age: Egg</p>
+        {% endif %}
+        </div>
+    </a>
+  </div>
+{% endfor %}
+
+{% endblock %}
